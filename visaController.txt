@@ -1,0 +1,252 @@
+#region Visa Assistance
+        public ActionResult VisaAssistance()
+        {
+            if (SessionHandler.Current.UserEmail != null)
+            {
+                VisaAssistanceVM visaAssistanceVM = new VisaAssistanceVM();
+                visaAssistanceVM = repository.ShowAllVisaAssistance();
+                return View(visaAssistanceVM);
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+        }
+        [HttpPost]
+        public ActionResult VisaAssistance(VisaAssistanceVM visaAssistanceVM)
+        {
+            visaAssistanceVM.modifiedBy = SessionHandler.Current.UserEmail;
+            visaAssistanceVM.modifiedOn = DateTime.Now;
+            visaAssistanceVM.isActive = true;
+            repository.SaveVisaAssistance(visaAssistanceVM);
+            return Redirect("/CMSForStudents/VisaAssistance");
+        }
+
+        public ActionResult VisaAssistanceCountry(int id)
+        {
+            if (SessionHandler.Current.UserEmail != null)
+            {
+                TempData["data"] = id;
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+        }
+        public JsonResult getVisaAssistanceCountry(int id)
+        {
+
+            //return View(obj);
+            var jsonData = new
+            {
+                data = repository.GetVisaAssistanceCountry(id)
+
+            };
+            return Json(jsonData, JsonRequestBehavior.AllowGet);
+
+        }
+        public ActionResult AddVisaAssistanceCountry(int id)
+        {
+            if (SessionHandler.Current.UserEmail != null)
+            {
+                VisaCountryVM visaCountryVM = new VisaCountryVM();
+                ViewBag.message = id;
+                visaCountryVM.isActive = true;
+                return View(visaCountryVM);
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+        }
+        [HttpPost]
+        public ActionResult AddVisaAssistanceCountry(VisaCountryVM visaCountryVM, int id, HttpPostedFileBase filesupload, HttpPostedFileBase filesuploadTwo, HttpPostedFileBase filesuploadThree, HttpPostedFileBase filesuploadFour)
+        {
+            if (filesupload != null)
+            {
+                var guidd = Guid.NewGuid().ToString().Split('-');
+                string image_guid = DateTime.Now.ToString("mmddyyymmss") + "_" + guidd[1] + ".jpg";
+                string imagePath = Path.Combine(System.Web.HttpContext.Current.Server.MapPath(@"/Images/CountryUniversity"), image_guid);
+                filesupload.SaveAs(imagePath);
+                visaCountryVM.imageUrlOne = image_guid;
+            }
+            if (filesuploadTwo != null)
+            {
+                var guidd = Guid.NewGuid().ToString().Split('-');
+                string image_guid = DateTime.Now.ToString("mmddyyymmss") + "_" + guidd[1] + ".jpg";
+                string imagePath = Path.Combine(System.Web.HttpContext.Current.Server.MapPath(@"/Images/CountryUniversity"), image_guid);
+                filesuploadTwo.SaveAs(imagePath);
+                visaCountryVM.imageUrlTwo = image_guid;
+            }
+            if (filesuploadThree != null)
+            {
+                var guidd = Guid.NewGuid().ToString().Split('-');
+                string image_guid = DateTime.Now.ToString("mmddyyymmss") + "_" + guidd[1] + ".jpg";
+                string imagePath = Path.Combine(System.Web.HttpContext.Current.Server.MapPath(@"/Images/CountryUniversity"), image_guid);
+                filesuploadThree.SaveAs(imagePath);
+                visaCountryVM.imageUrlThree = image_guid;
+            }
+            if (filesuploadFour != null)
+            {
+                var guidd = Guid.NewGuid().ToString().Split('-');
+                string image_guid = DateTime.Now.ToString("mmddyyymmss") + "_" + guidd[1] + ".jpg";
+                string imagePath = Path.Combine(System.Web.HttpContext.Current.Server.MapPath(@"/Images/CountryUniversity"), image_guid);
+                filesuploadFour.SaveAs(imagePath);
+                visaCountryVM.imageUrlFour = image_guid;
+            }
+            visaCountryVM.visaId = id;
+            visaCountryVM.modifiedBy = SessionHandler.Current.UserEmail;
+            visaCountryVM.modifiedOn = DateTime.Now;
+            repository.SaveVisaAssistanceCountry(visaCountryVM);
+            return RedirectToAction("VisaAssistanceCountry", "CMSForStudents", new { id = visaCountryVM.visaId });
+
+        }
+        public ActionResult EditVisaAssistanceCountry(int id)
+        {
+            if (SessionHandler.Current.UserEmail != null)
+            {
+                VisaCountryVM visaCountryVM = new VisaCountryVM();
+                visaCountryVM = repository.EditVisaAssistanceCountry(id);
+                return View(visaCountryVM);
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
+        }
+        [HttpPost]
+        public ActionResult EditVisaAssistanceCountry(VisaCountryVM visaCountryVM, HttpPostedFileBase filesupload, HttpPostedFileBase filesuploadTwo, HttpPostedFileBase filesuploadThree, HttpPostedFileBase filesuploadFour)
+        {
+            if (filesupload != null)
+            {
+                string imageUrl = Server.MapPath(visaCountryVM.imageUrlOne);
+
+                if (System.IO.File.Exists(imageUrl))
+                {
+                    System.IO.File.Delete(imageUrl);
+                }
+                var guidd = Guid.NewGuid().ToString().Split('-');
+                string image_guid = DateTime.Now.ToString("mmddyyymmss") + "_" + guidd[1] + ".jpg";
+                string imagePath = Path.Combine(System.Web.HttpContext.Current.Server.MapPath(@"/Images/CountryUniversity"), image_guid);
+                bool exists = System.IO.Directory.Exists(Server.MapPath(@"/Images/CountryUniversity"));
+                if (!exists)
+                    System.IO.Directory.CreateDirectory(Server.MapPath(@"/Images/CountryUniversity"));
+                filesupload.SaveAs(imagePath);
+                visaCountryVM.imageUrlOne = image_guid;
+            }
+            else
+            {
+                visaCountryVM.imageUrlOne = Path.GetFileName(visaCountryVM.imageUrlOne);
+
+            }
+            if (filesuploadTwo != null)
+            {
+                string imageUrl = Server.MapPath(visaCountryVM.imageUrlTwo);
+
+                if (System.IO.File.Exists(imageUrl))
+                {
+                    System.IO.File.Delete(imageUrl);
+                }
+                var guidd = Guid.NewGuid().ToString().Split('-');
+                string image_guid = DateTime.Now.ToString("mmddyyymmss") + "_" + guidd[1] + ".jpg";
+                string imagePath = Path.Combine(System.Web.HttpContext.Current.Server.MapPath(@"/Images/CountryUniversity"), image_guid);
+                bool exists = System.IO.Directory.Exists(Server.MapPath(@"/Images/CountryUniversity"));
+                if (!exists)
+                    System.IO.Directory.CreateDirectory(Server.MapPath(@"/Images/CountryUniversity"));
+                filesuploadTwo.SaveAs(imagePath);
+                visaCountryVM.imageUrlTwo = image_guid;
+            }
+            else
+            {
+                visaCountryVM.imageUrlTwo = Path.GetFileName(visaCountryVM.imageUrlTwo);
+
+            }
+            if (filesuploadThree != null)
+            {
+                string imageUrl = Server.MapPath(visaCountryVM.imageUrlThree);
+
+                if (System.IO.File.Exists(imageUrl))
+                {
+                    System.IO.File.Delete(imageUrl);
+                }
+                var guidd = Guid.NewGuid().ToString().Split('-');
+                string image_guid = DateTime.Now.ToString("mmddyyymmss") + "_" + guidd[1] + ".jpg";
+                string imagePath = Path.Combine(System.Web.HttpContext.Current.Server.MapPath(@"/Images/CountryUniversity"), image_guid);
+                bool exists = System.IO.Directory.Exists(Server.MapPath(@"/Images/CountryUniversity"));
+                if (!exists)
+                    System.IO.Directory.CreateDirectory(Server.MapPath(@"/Images/CountryUniversity"));
+                filesuploadThree.SaveAs(imagePath);
+                visaCountryVM.imageUrlThree = image_guid;
+            }
+            else
+            {
+                visaCountryVM.imageUrlThree = Path.GetFileName(visaCountryVM.imageUrlThree);
+
+            }
+            if (filesuploadFour != null)
+            {
+                string imageUrl = Server.MapPath(visaCountryVM.imageUrlFour);
+
+                if (System.IO.File.Exists(imageUrl))
+                {
+                    System.IO.File.Delete(imageUrl);
+                }
+                var guidd = Guid.NewGuid().ToString().Split('-');
+                string image_guid = DateTime.Now.ToString("mmddyyymmss") + "_" + guidd[1] + ".jpg";
+                string imagePath = Path.Combine(System.Web.HttpContext.Current.Server.MapPath(@"/Images/CountryUniversity"), image_guid);
+                bool exists = System.IO.Directory.Exists(Server.MapPath(@"/Images/CountryUniversity"));
+                if (!exists)
+                    System.IO.Directory.CreateDirectory(Server.MapPath(@"/Images/CountryUniversity"));
+                filesuploadFour.SaveAs(imagePath);
+                visaCountryVM.imageUrlFour = image_guid;
+            }
+            else
+            {
+                visaCountryVM.imageUrlFour = Path.GetFileName(visaCountryVM.imageUrlFour);
+
+            }
+            visaCountryVM.modifiedBy = SessionHandler.Current.UserEmail;
+            visaCountryVM.modifiedOn = DateTime.Now;
+            repository.SaveEditVisaAssistanceCountry(visaCountryVM);
+            return RedirectToAction("VisaAssistanceCountry", "CMSForStudents", new { id = visaCountryVM.visaId });
+        }
+        public ActionResult DeleteVisaCountry(int id)
+        {
+            if (SessionHandler.Current.UserEmail != null)
+            {
+                VisaCountryVM visaCountryVM = new VisaCountryVM();
+                visaCountryVM = repository.EditVisaAssistanceCountry(id);
+                string imageUrlOne = Server.MapPath(visaCountryVM.imageUrlOne);
+                string imageUrlTwo = Server.MapPath(visaCountryVM.imageUrlTwo);
+                string imageUrlThree = Server.MapPath(visaCountryVM.imageUrlThree);
+                string imageUrlFour = Server.MapPath(visaCountryVM.imageUrlFour);
+                if (System.IO.File.Exists(imageUrlOne))
+                {
+                    System.IO.File.Delete(imageUrlOne);
+                }
+                if (System.IO.File.Exists(imageUrlTwo))
+                {
+                    System.IO.File.Delete(imageUrlTwo);
+                }
+                if (System.IO.File.Exists(imageUrlThree))
+                {
+                    System.IO.File.Delete(imageUrlThree);
+                }
+                if (System.IO.File.Exists(imageUrlFour))
+                {
+                    System.IO.File.Delete(imageUrlFour);
+                }
+                repository.DeleteVisaCountry(id);
+                return RedirectToAction("VisaAssistanceCountry", "CMSForStudents", new { id = visaCountryVM.visaId });
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+        }
+        #endregion
